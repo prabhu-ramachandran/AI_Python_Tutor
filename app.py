@@ -123,7 +123,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
         gr.Markdown("We use Hugging Face login (which supports Google/Gmail) to save your progress safely.")
 
     # --- Logic for Login Handling ---
-    def check_user(request: gr.Request):
+    def check_user(request):
         if request and request.username:
             return gr.update(visible=True), gr.update(visible=False)
         return gr.update(visible=False), gr.update(visible=True)
@@ -131,7 +131,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     demo.load(check_user, None, [main_container, login_prompt])
 
     # --- Chat Logic with Side Effects ---
-    def submit_message(user_text, history, module_name, goal_name):
+    def submit_message(user_text, history, module_name, goal_name, request):
         if not user_text.strip():
             return {txt_input: gr.update()}
 
@@ -156,7 +156,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
         
         if "[MODULE_COMPLETE]" in ai_response:
             ai_response = ai_response.replace("[MODULE_COMPLETE]", "").strip()
-            ai_response += "\n\n🎉 **Module Complete! Moving to the next step...**"
+            ai_response += "\n\n🎉 **Module Complete! Unlocking the next level...**"
             
             modules = CURRICULUM[goal_name]
             try:
@@ -168,7 +168,17 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                 
                 if current_idx != -1 and current_idx < len(modules) - 1:
                     updated_mod_state = modules[current_idx + 1]
-            except:
+                    
+                    # SAVE PROGRESS TO DB
+                    if request and request.username:
+                        steps_taken = len(new_history) // 2
+                        metrics = {
+                            "completed_module_name": module_name,
+                            "steps": steps_taken
+                        }
+                        save_progress(request.username, goal_name, updated_mod_state, metrics)
+            except Exception as e:
+                print(f"Error saving progress: {e}")
                 pass
 
         final_history = new_history + [{"role": "assistant", "content": ai_response}]
