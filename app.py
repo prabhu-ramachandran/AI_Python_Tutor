@@ -6,7 +6,11 @@ from starlette.responses import RedirectResponse
 import uvicorn
 import os
 import json
+from dotenv import load_dotenv
 from datetime import datetime
+
+load_dotenv()
+
 from logic import socratic_agent
 from langchain_core.messages import HumanMessage, AIMessage
 from vision import get_vision_tab, calculate_xp, get_xp_html
@@ -79,12 +83,17 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                         with gr.Column():
                             gr.Markdown("### 🏏 Gully Cricket Game")
                             btn_cricket = gr.Button("Choose Cricket 🏏", variant="primary")
+                            gr.Video(value="static/demos/cricket_demo.mp4", label="Demo", interactive=False, autoplay=True, loop=True, show_label=False)
+                        
                         with gr.Column():
                             gr.Markdown("### 🌐 Food Blog Generator")
                             btn_blog = gr.Button("Choose Food Blog 🌐", variant="primary")
+                            gr.Video(value="static/demos/blog_demo.mp4", label="Demo", interactive=False, autoplay=True, loop=True, show_label=False)
+                        
                         with gr.Column():
                             gr.Markdown("### 💰 Kharcha Tracker")
                             btn_finance = gr.Button("Choose Expense Tracker 💰", variant="primary")
+                            gr.Video(value="static/demos/tracker_demo.mp4", label="Demo", interactive=False, autoplay=True, loop=True, show_label=False)
 
                 with gr.Column(visible=False) as tutor_screen:
                     with gr.Row():
@@ -97,6 +106,11 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                             m4 = gr.Button("4. Module"); m5 = gr.Button("5. Module"); m6 = gr.Button("6. Module")
                             gr.Markdown("### 🔒 Level 2 (Locked)")
                             gr.Button("7. Advanced Engineering", interactive=False)
+                            
+                            gr.Markdown("---")
+                            gr.Markdown("### 🕵️ Tutor's Secret Tool")
+                            gr.Markdown("Real developers don't memorize everything! Stuck? **Ask me for keywords** to search on Google. Finding solutions is a superpower! 🚀")
+                        
                         with gr.Column(scale=3):
                             chatbot_comp = gr.Chatbot(label="Socratic Tutor")
                             with gr.Row():
@@ -115,7 +129,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
 
     def get_status_markdown(username):
         progress = get_user_progress(username)
-        completed = progress.get("completed", {})
+        completed = progress.get("completed", {}) if progress else {}
         status_msg = "### 🏆 Your Level 1 Progress\n"
         all_done = True
         for goal, modules in CURRICULUM.items():
@@ -129,6 +143,12 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     def check_user(request: gr.Request):
         session = request.request.session
         user = session.get("user")
+        
+        # Local Development Bypass
+        host = request.request.client.host if request.request.client else ""
+        if not user and (host == "127.0.0.1" or host == "localhost" or not os.environ.get("OAUTH_CLIENT_ID")):
+            user = "local-dev"
+            
         if user:
             try: ensure_user_exists(user)
             except: pass

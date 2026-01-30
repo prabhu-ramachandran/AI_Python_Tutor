@@ -29,7 +29,9 @@ def call_model(state: AgentState):
         "2. Always ask one leading question at a time.\n"
         "3. Use local Bangalore analogies (cricket, silk sarees, traffic, metro) that relate to the current goal.\n"
         "4. If they get it right, celebrate and move to the next concept with a new question.\n"
-        "5. IMPORTANT: When the student has clearly mastered the CURRENT concept/module, append the tag '[MODULE_COMPLETE]' to the end of your message."
+        "5. IMPORTANT: When the student has clearly mastered the CURRENT concept/module, append the tag '[MODULE_COMPLETE]' to the end of your message.\n"
+        "6. ENCOURAGE SELF-SUFFICIENCY: If a student is stuck on a technical error or syntax, do not just give the answer. Encourage them to search on Google. "
+        "Teach them WHAT to search for (e.g., 'How to print a variable in Python'). Give them the specific 'Keywords' to use."
     ))
     
     try:
