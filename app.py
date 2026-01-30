@@ -53,7 +53,7 @@ CURRICULUM = {
 }
 
 # UI Layout
-with gr.Blocks(title="Bengaluru AI Tutor") as demo:
+with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     with gr.Row():
         gr.Markdown("# 🏫 Bengaluru AI Code Lab")
         login_btn = gr.LoginButton()
@@ -247,4 +247,6 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
 
     if __name__ == "__main__":
 
-        demo.launch(theme=gr.themes.Soft())
+    
+
+        demo.launch()
