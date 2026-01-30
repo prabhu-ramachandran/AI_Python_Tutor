@@ -56,7 +56,7 @@ CURRICULUM = {
 with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     with gr.Row():
         gr.Markdown("# 🏫 Bengaluru AI Code Lab")
-        login_btn = gr.LoginButton()
+        # Login is handled by Browser Popup now
 
     # State Management
     current_view = gr.State("selection")
@@ -125,29 +125,13 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     # --- Logic for Login Handling ---
     def check_user(request: gr.Request):
         print(f"--- Login Check ---")
-        if request:
-            print(f"Request detected. Attributes: {dir(request)}")
-            print(f"Username directly: {request.username}")
-            try:
-                # Sometimes it's in kwargs or other headers
-                print(f"Headers: {request.headers}")
-            except:
-                pass
-        else:
-            print("No request object detected.")
-
-        if request and request.username:
-            try:
-                # Auto-register user if new
-                ensure_user_exists(request.username)
-                print(f"User {request.username} verified in database.")
-            except Exception as e:
-                print(f"Database error during login: {e}")
-            
-            return gr.update(visible=True), gr.update(visible=False)
+        # With Basic Auth, if this runs, they are logged in.
+        # Gradio populates request.username for Basic Auth too.
+        user = request.username if request else "student"
         
-        print("Redirecting to login prompt.")
-        return gr.update(visible=False), gr.update(visible=True)
+        print(f"Verified User: {user}")
+        ensure_user_exists(user)
+        return gr.update(visible=True), gr.update(visible=False)
 
     demo.load(check_user, None, [main_container, login_prompt], api_name=False)
 
@@ -276,5 +260,11 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
 
     btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp], api_name=False)
 
+import os
+
+# ... (rest of the file) ...
+
 if __name__ == "__main__":
-    demo.launch()
+    port = int(os.environ.get("PORT", 7860))
+    # Simple Auth for Railway MVP (Login: student / learn)
+    demo.launch(server_name="0.0.0.0", server_port=port, auth=("student", "learn"))

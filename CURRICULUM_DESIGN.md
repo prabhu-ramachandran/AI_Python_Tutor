@@ -1,97 +1,69 @@
-# 🎓 Bengaluru AI Tutor: Curriculum Design & Skill Tree
+# 🎓 Bengaluru AI Tutor: Curriculum Design & Graduate Profile
 
-## 🌟 Vision
-To transform absolute beginners into Full Stack Python Developers by mapping practical projects to core competency pillars. The system will track "Skill XP" rather than just "Test Scores".
+## 🌟 The Graduate Profile (Level 1)
+After completing these three projects, the student will have transitioned from a "code learner" to a "junior builder". They will possess the following measurable skills:
 
----
+### 🧠 Logic & Python Core
+- **Syntax Mastery:** Variables, F-strings, Type conversion, Boolean logic.
+- **Control Flow:** `if/elif/else`, `for` loops (iteration), `while` loops (app lifecycle).
+- **Modularity:** Defining and calling functions with arguments and return values.
+- **Resilience:** Using `try/except` to handle user input errors and file missing errors.
 
-## 🏗️ The 5 Pillars of Competency
+### 🎨 Frontend & Presentation
+- **Console UI:** Building interactive command-line interfaces.
+- **Web Basics:** Understanding HTML structure (tags, attributes) and CSS basics.
+- **Templating:** Generating dynamic web content by injecting Python data into HTML.
 
-| Pillar | Focus Area | Description |
-| :--- | :--- | :--- |
-| **Logic (🧠)** | Python Core, Algo, ML | The brain of the application. Decisions, math, and AI logic. |
-| **Frontend (🎨)** | UI/UX, HTML, Templates | Visual output. Generating reports, websites, or console UIs. |
-| **Database (🗄️)** | Data Structures, SQL, I/O | Memory. Storing user data, expenses, or game scores. |
-| **Backend (⚙️)** | APIs, Functions, Classes | The machinery. Connecting the logic to the data and UI. |
-| **Infra (☁️)** | Git, Env, Deployment | The workshop. Setting up tools, servers, and version control. |
+### 🗄️ Database & Data Handling
+- **Structures:** Mastery of Lists and Dictionaries (Key-Value pairs).
+- **Persistence:** Reading and writing to `.txt` and `.csv` files.
+- **Aggregation:** Calculating totals, averages, and finding max/min values in datasets.
+
+### ⚙️ Backend & Engineering
+- **File Systems:** Navigating directories and managing file paths.
+- **Project Structure:** Organizing code into multiple modules.
+- **State Management:** Tracking app state (score, wallet balance, blog list).
+
+### ☁️ Infrastructure & DevOps
+- **Local Env:** Managing Virtual Environments (`venv`) and `requirements.txt`.
+- **Version Control:** Full Git workflow (`init`, `add`, `commit`, `log`).
+- **Cloud Basics:** Deploying static sites to GitHub Pages or Netlify.
 
 ---
 
 ## 🏏 Project 1: The Gully Cricket Game
-*Goal: Build a text-based cricket simulator.*
+**Theme:** Logic, Loops, and State.
+**Duration:** 2-3 Weeks.
 
-### Module 1: The Stadium Setup (Input/Output)
-*   **Concept:** `print()`, `input()`
-*   **Skill Gained:** **Logic +1**, **Frontend +1** (Console UI)
-*   **Assessment Goal:** Can the student prompt the user and display a response?
-
-### Module 2: The Scoreboard (Variables)
-*   **Concept:** Integers, Strings, Assignment (`runs = 0`)
-*   **Skill Gained:** **Database +1** (In-memory storage)
-*   **Assessment Goal:** Can the student initialize and update a variable?
-
-### Module 3: The Umpire (Conditionals)
-*   **Concept:** `if/else`, `random.randint()`
-*   **Skill Gained:** **Logic +2** (Decision making)
-*   **Assessment Goal:** Can the student handle random events (Out vs Six)?
-
-### Module 4: The Match (Loops)
-*   **Concept:** `while` loops, `break`
-*   **Skill Gained:** **Logic +2** (Game Loop)
-*   **Assessment Goal:** Can the student run the game until 6 balls are over?
+1.  **Mod 1: The Stadium (I/O):** `print`, `input`, and terminal basics.
+2.  **Mod 2: The Scoreboard (Variables):** Integer/String management and score math.
+3.  **Mod 3: The Umpire (Conditionals):** Complex `if/elif/else` for game rules.
+4.  **Mod 4: The Over (Loops):** Using `while` loops to manage turns and game-over state.
+5.  **Mod 5: The Commentary (Functions):** Reusable code blocks for bowling and batting.
+6.  **Mod 6: Match Recap (Infra/Git):** Initializing Git and committing the final game code.
 
 ---
 
 ## 🌐 Project 2: The Food Blog Generator
-*Goal: Generate a static HTML page for restaurant reviews.*
+**Theme:** Data Structures and Web Templating.
+**Duration:** 3-4 Weeks.
 
-### Module 1: The Menu Card (Strings)
-*   **Concept:** F-Strings, Multi-line Strings
-*   **Skill Gained:** **Frontend +2** (HTML Structure)
-*   **Assessment Goal:** Can the student template a string with variable data?
-
-### Module 2: Top Hotels (Lists)
-*   **Concept:** Lists `[]`, `append()`, Indexing
-*   **Skill Gained:** **Database +2** (Structured Data)
-*   **Assessment Goal:** Can the student manage a collection of items?
-
-### Module 3: The Publisher (File I/O)
-*   **Concept:** `open()`, `write()`
-*   **Skill Gained:** **Infra +1** (File System interaction)
-*   **Assessment Goal:** Can the student create a persistent file on disk?
+1.  **Mod 1: The Menu (Strings):** F-Strings and HTML structure skeletons.
+2.  **Mod 2: The Foodies List (Lists):** Managing a collection of hotel names.
+3.  **Mod 3: Hotel Cards (Dictionaries):** Mapping Name, Rating, and Location per hotel.
+4.  **Mod 4: The Generator (Loops):** Iterating through the list to build the HTML string.
+5.  **Mod 5: Go Live (File I/O):** Saving the generated content to an `index.html` file.
+6.  **Mod 6: Cloud Launch (Infra):** Pushing to GitHub and deploying via GitHub Pages.
 
 ---
 
-## 💰 Project 3: The Kharcha (Expense) Tracker
-*Goal: A CLI tool to log and sum daily expenses.*
+## 💰 Project 3: The Kharcha Tracker
+**Theme:** Persistence, Data Analysis, and App Lifecycle.
+**Duration:** 4-5 Weeks.
 
-### Module 1: The Wallet (Data Types)
-*   **Concept:** `int` vs `str`, Type Conversion
-*   **Skill Gained:** **Database +1** (Data Integrity)
-*   **Assessment Goal:** Can the student convert "50" (str) to 50 (int)?
-
-### Module 2: Daily Log (Dictionaries)
-*   **Concept:** Key-Value pairs `{"Coffee": 20}`
-*   **Skill Gained:** **Database +2** (Key-Value Storage)
-*   **Assessment Goal:** Can the student map an item to its cost?
-
-### Module 3: The Auditor (Math & Logic)
-*   **Concept:** Summation, Average calculation
-*   **Skill Gained:** **Logic +2** (Data Analysis)
-*   **Assessment Goal:** Can the student calculate the total from a collection?
-
----
-
-## 🚀 Future Levels (Roadmap)
-
-### Level 2: Modularization
-*   **Projects:** Refactoring Cricket into Functions, Moving Expense Data to SQLite.
-*   **Skills:** **Backend +3** (Functions), **Database +3** (SQL).
-
-### Level 3: Web Enablement
-*   **Projects:** Flask App for Food Blog, API for Cricket Scores.
-*   **Skills:** **Backend +4**, **Frontend +3** (Jinja2/React).
-
-### Level 4: Intelligence
-*   **Projects:** AI Bot that learns to beat you at Cricket.
-*   **Skills:** **Logic +5** (Basic ML/Heuristics).
+1.  **Mod 1: The Wallet (Data Types):** Strict type handling and data validation.
+2.  **Mod 2: The Daily Ledger (CSV):** Learning to read from and write to CSV files.
+3.  **Mod 3: The App Menu (Flow):** Building a continuous `while True` app interface.
+4.  **Mod 4: The Auditor (Logic):** Aggregating data (Total spending, average per category).
+5.  **Mod 5: The Workshop (Infra):** Setting up a `venv` and managing dependencies.
+6.  **Mod 6: Portfolio (Final):** Creating a README and final Git push for the Level 1 portfolio.
