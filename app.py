@@ -72,6 +72,8 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                     gr.Markdown("## 👋 Namaskara! What do you want to build first?")
                     gr.Markdown("Choose your **Beginner Level** project. We will learn Python step-by-step to build this.")
                     
+                    status_display = gr.Markdown("### 🏆 Your Level 1 Progress\n- ⚪ Cricket: 0/6\n- ⚪ Blog: 0/6\n- ⚪ Tracker: 0/6")
+
                     with gr.Row():
                         with gr.Column():
                             gr.Markdown("### 🏏 Gully Cricket Game")
@@ -117,6 +119,27 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             # Add the Vision Tab
             get_vision_tab()
 
+    def get_status_markdown(username):
+        progress = get_user_progress(username)
+        completed = progress.get("completed", {}) if progress else {}
+        
+        status_msg = "### 🏆 Your Level 1 Progress\n"
+        all_done = True
+        for goal, modules in CURRICULUM.items():
+            done_count = sum(1 for m in modules if m in completed)
+            total = len(modules)
+            emoji = "✅" if done_count == total else "🟡" if done_count > 0 else "⚪"
+            status_msg += f"- {emoji} **{goal}**: {done_count}/{total} Modules\n"
+            if done_count < total:
+                all_done = False
+        
+        if all_done:
+            status_msg += "\n🌟 **Congratulations! You have completed Level 1! Level 2 is now unlocked.**"
+        else:
+            status_msg += "\n*Complete all 3 projects to unlock Level 2.*"
+            
+        return status_msg
+
     # --- Logic for Login Handling ---
     def check_user(request: gr.Request):
         print(f"--- Login Check ---")
@@ -126,9 +149,10 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             ensure_user_exists(user)
         except Exception as e:
             print(f"DB Error: {e}")
-        return gr.update() # No visibility change needed
+        
+        return gr.update(), get_status_markdown(user)
 
-    demo.load(check_user, None, None, api_name=False)
+    demo.load(check_user, None, [main_container, status_display], api_name=False)
 
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name, request: gr.Request):
@@ -245,15 +269,17 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     btn_blog.click(start_course, gr.State("Food Blog"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp], api_name=False)
     btn_finance.click(start_course, gr.State("Expense Tracker"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp], api_name=False)
     
-    def go_back():
+    def go_back(request: gr.Request):
+        user = request.username if (request and request.username) else "student"
         return {
             welcome_screen: gr.update(visible=True),
             tutor_screen: gr.update(visible=False),
             selected_goal: None,
-            chatbot_comp: []
+            chatbot_comp: [],
+            status_display: get_status_markdown(user)
         }
 
-    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp], api_name=False)
+    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp, status_display], api_name=False)
 
 import os
 
