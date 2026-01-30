@@ -2,6 +2,8 @@ import gradio as gr
 from logic import socratic_agent
 from langchain_core.messages import HumanMessage, AIMessage
 from vision import get_vision_tab
+# Database imports
+from database import save_progress, ensure_user_exists, get_user_progress
 
 def chat_with_tutor(message, history, module_name, goal_name):
     # Convert history for the Agent
