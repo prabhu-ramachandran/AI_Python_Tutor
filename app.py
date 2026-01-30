@@ -128,7 +128,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             return gr.update(visible=True), gr.update(visible=False)
         return gr.update(visible=False), gr.update(visible=True)
 
-    demo.load(check_user, None, [main_container, login_prompt])
+    demo.load(check_user, None, [main_container, login_prompt], api_name=False)
 
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name, request):
@@ -193,12 +193,14 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     txt_input.submit(
         submit_message, 
         [txt_input, chatbot_comp, selected_mod, selected_goal], 
-        [chatbot_comp, txt_input, selected_mod]
+        [chatbot_comp, txt_input, selected_mod],
+        api_name=False
     )
     btn_submit.click(
         submit_message, 
         [txt_input, chatbot_comp, selected_mod, selected_goal], 
-        [chatbot_comp, txt_input, selected_mod]
+        [chatbot_comp, txt_input, selected_mod],
+        api_name=False
     )
 
     # --- Logic for View Switching ---
@@ -232,16 +234,16 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     def set_active_module(btn_text):
         return btn_text.split(". ")[1]
 
-    m1.click(set_active_module, m1, selected_mod)
-    m2.click(set_active_module, m2, selected_mod)
-    m3.click(set_active_module, m3, selected_mod)
-    m4.click(set_active_module, m4, selected_mod)
-    m5.click(set_active_module, m5, selected_mod)
-    m6.click(set_active_module, m6, selected_mod)
+    m1.click(set_active_module, m1, selected_mod, api_name=False)
+    m2.click(set_active_module, m2, selected_mod, api_name=False)
+    m3.click(set_active_module, m3, selected_mod, api_name=False)
+    m4.click(set_active_module, m4, selected_mod, api_name=False)
+    m5.click(set_active_module, m5, selected_mod, api_name=False)
+    m6.click(set_active_module, m6, selected_mod, api_name=False)
 
-    btn_cricket.click(start_course, gr.State("Cricket Game"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
-    btn_blog.click(start_course, gr.State("Food Blog"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
-    btn_finance.click(start_course, gr.State("Expense Tracker"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
+    btn_cricket.click(start_course, gr.State("Cricket Game"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp], api_name=False)
+    btn_blog.click(start_course, gr.State("Food Blog"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp], api_name=False)
+    btn_finance.click(start_course, gr.State("Expense Tracker"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp], api_name=False)
     
     def go_back():
         return {
@@ -251,7 +253,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             chatbot_comp: []
         }
 
-    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp])
+    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp], api_name=False)
 
 if __name__ == "__main__":
     demo.launch()
