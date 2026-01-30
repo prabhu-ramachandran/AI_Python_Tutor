@@ -27,19 +27,28 @@ def chat_with_tutor(message, history, module_name, goal_name):
 # Curriculum Definitions
 CURRICULUM = {
     "Cricket Game": [
-        "Setup: The Stadium (Print & Input)",
-        "Scoreboard: Storing Runs (Variables)",
-        "Umpire: Out or Not Out? (Conditionals)"
+        "The Stadium (I/O)",
+        "The Scoreboard (Variables)",
+        "The Umpire (Conditionals)",
+        "The Over (Loops)",
+        "The Commentary (Functions)",
+        "Match Recap (Git)"
     ],
     "Food Blog": [
-        "Menu Card: Writing Text (Strings)",
-        "Top Hotels: Making a List (Lists)",
-        "Publishing: Saving to File (File I/O)"
+        "The Menu (Strings)",
+        "The Foodies List (Lists)",
+        "Hotel Cards (Dictionaries)",
+        "The Generator (Loops)",
+        "Go Live (File I/O)",
+        "Cloud Launch (Infra)"
     ],
     "Expense Tracker": [
-        "Pocket Money: The Wallet (Integers)",
-        "Bill Total: Adding it up (Math)",
-        "Daily Log: Keeping Track (Loops)"
+        "The Wallet (Data Types)",
+        "Daily Ledger (CSV)",
+        "App Menu (Flow)",
+        "The Auditor (Logic)",
+        "The Workshop (Infra)",
+        "Portfolio (Final)"
     ]
 }
 
@@ -89,19 +98,18 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
                         with gr.Column(scale=1):
                             gr.Markdown("### 🗺️ Your Path")
                             # Placeholder buttons for the curriculum
-                            m1 = gr.Button("1. Basics & Setup")
-                            m2 = gr.Button("2. Variables")
-                            m3 = gr.Button("3. Logic & Decisions")
+                            m1 = gr.Button("1. Module")
+                            m2 = gr.Button("2. Module")
+                            m3 = gr.Button("3. Module")
+                            m4 = gr.Button("4. Module")
+                            m5 = gr.Button("5. Module")
+                            m6 = gr.Button("6. Module")
 
                             gr.Markdown("### 🔒 Level 2 (Locked)")
-                            gr.Button("4. Functions & Logic", interactive=False)
-                            gr.Button("5. Data Structures", interactive=False)
+                            gr.Button("7. Advanced Engineering", interactive=False)
                             
-                            gr.Markdown("### 🔒 Level 3 (Locked)")
-                            gr.Button("6. Final Project", interactive=False)
-
                         with gr.Column(scale=3):
-                            chatbot_comp = gr.Chatbot(label="Socratic Tutor")
+                            chatbot_comp = gr.Chatbot(label="Socratic Tutor", type="messages")
                             with gr.Row():
                                 txt_input = gr.Textbox(show_label=False, placeholder="Type your answer here...", scale=4)
                                 btn_submit = gr.Button("Send ➤", scale=1)
@@ -125,12 +133,10 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name):
         if not user_text.strip():
-            return {txt_input: gr.update()} # Do nothing if empty
+            return {txt_input: gr.update()}
 
-        # 1. Update history with user message
         new_history = history + [{"role": "user", "content": user_text}]
         
-        # 2. Convert for Agent
         formatted_history = []
         for msg in new_history:
             if msg['role'] == 'user':
@@ -138,7 +144,6 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
             elif msg['role'] == 'assistant':
                 formatted_history.append(AIMessage(content=msg['content']))
 
-        # 3. Call Agent
         input_state = {
             "messages": formatted_history,
             "module_name": module_name,
@@ -147,15 +152,12 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
         result = socratic_agent.invoke(input_state)
         ai_response = result["messages"][-1].content
         
-        # 4. Check for [MODULE_COMPLETE] signal
-        next_mod_update = gr.update()
         updated_mod_state = module_name
         
         if "[MODULE_COMPLETE]" in ai_response:
             ai_response = ai_response.replace("[MODULE_COMPLETE]", "").strip()
-            ai_response += "\n\n🎉 **Module Complete! Unlocking the next level...**"
+            ai_response += "\n\n🎉 **Module Complete! Moving to the next step...**"
             
-            # Logic to switch to next module (simple hardcoded sequence for now)
             modules = CURRICULUM[goal_name]
             try:
                 current_idx = -1
@@ -165,19 +167,15 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
                         break
                 
                 if current_idx != -1 and current_idx < len(modules) - 1:
-                    next_mod_name = modules[current_idx + 1]
-                    updated_mod_state = next_mod_name
-                    # Highlight the next button (simulation)
-                    # Ideally we would update the specific button color here
+                    updated_mod_state = modules[current_idx + 1]
             except:
                 pass
 
-        # 5. Final History Update
         final_history = new_history + [{"role": "assistant", "content": ai_response}]
         
         return {
             chatbot_comp: final_history,
-            txt_input: "",  # Clear input
+            txt_input: "",
             selected_mod: updated_mod_state
         }
 
@@ -198,7 +196,6 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
         modules = CURRICULUM[goal]
         first_mod = modules[0]
         
-        # Get an initial greeting from the AI
         initial_input = {
             "messages": [HumanMessage(content=f"I have just started the {goal} course. Please introduce yourself and start the first lesson!")],
             "module_name": first_mod,
@@ -216,21 +213,25 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
             m1: gr.update(value=f"1. {modules[0]}"),
             m2: gr.update(value=f"2. {modules[1]}"),
             m3: gr.update(value=f"3. {modules[2]}"),
+            m4: gr.update(value=f"4. {modules[3]}"),
+            m5: gr.update(value=f"5. {modules[4]}"),
+            m6: gr.update(value=f"6. {modules[5]}"),
             chatbot_comp: [{"role": "assistant", "content": greeting}]
         }
 
     def set_active_module(btn_text):
-        # Extract the module name (remove "1. " prefix)
         return btn_text.split(". ")[1]
 
-    # Link module buttons to state
     m1.click(set_active_module, m1, selected_mod)
     m2.click(set_active_module, m2, selected_mod)
     m3.click(set_active_module, m3, selected_mod)
+    m4.click(set_active_module, m4, selected_mod)
+    m5.click(set_active_module, m5, selected_mod)
+    m6.click(set_active_module, m6, selected_mod)
 
-    btn_cricket.click(start_course, gr.State("Cricket Game"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, chatbot_comp])
-    btn_blog.click(start_course, gr.State("Food Blog"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, chatbot_comp])
-    btn_finance.click(start_course, gr.State("Expense Tracker"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, chatbot_comp])
+    btn_cricket.click(start_course, gr.State("Cricket Game"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
+    btn_blog.click(start_course, gr.State("Food Blog"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
+    btn_finance.click(start_course, gr.State("Expense Tracker"), [welcome_screen, tutor_screen, goal_display, selected_goal, selected_mod, m1, m2, m3, m4, m5, m6, chatbot_comp])
     
     def go_back():
         return {
@@ -240,7 +241,10 @@ with gr.Blocks(title="Bengaluru AI Tutor") as demo:
             chatbot_comp: []
         }
 
-    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp])
+        btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp])
 
-if __name__ == "__main__":
-    demo.launch(theme=gr.themes.Soft())
+    
+
+    if __name__ == "__main__":
+
+        demo.launch(theme=gr.themes.Soft())
