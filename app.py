@@ -126,7 +126,13 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     def check_user(request: gr.Request):
         print(f"--- Login Check ---")
         if request:
-            print(f"Request detected. Username: {request.username}")
+            print(f"Request detected. Attributes: {dir(request)}")
+            print(f"Username directly: {request.username}")
+            try:
+                # Sometimes it's in kwargs or other headers
+                print(f"Headers: {request.headers}")
+            except:
+                pass
         else:
             print("No request object detected.")
 
