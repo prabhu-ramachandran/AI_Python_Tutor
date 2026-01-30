@@ -60,7 +60,7 @@ CURRICULUM = {
 with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     with gr.Row():
         gr.Markdown("# 🏫 Bengaluru AI Code Lab")
-        # Login is handled by Browser Popup now
+        login_btn = gr.LoginButton()
 
     # State Management
     current_view = gr.State("selection")
@@ -68,7 +68,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     selected_mod = gr.State("Intro")
 
     # This column contains the main app
-    with gr.Column(visible=True) as main_container:
+    with gr.Column(visible=False) as main_container:
         with gr.Tabs():
             with gr.TabItem("🎓 Classroom"):
                 # --- VIEW 1: Goal Selection (Beginner Level) ---
@@ -132,6 +132,11 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             # Add the Vision Tab
             get_vision_tab()
 
+    # Message to show when not logged in
+    with gr.Column(visible=True) as login_prompt:
+        gr.Markdown("### Please sign in to start your learning journey! 🚀")
+        gr.Markdown("Sign in with Google to save your progress safely.")
+
     def get_status_markdown(username):
         progress = get_user_progress(username)
         completed = progress.get("completed", {}) if progress else {}
@@ -156,16 +161,19 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     # --- Logic for Login Handling ---
     def check_user(request: gr.Request):
         print(f"--- Login Check ---")
-        user = request.username if (request and request.username) else "student"
-        print(f"User: {user}")
-        try:
-            ensure_user_exists(user)
-        except Exception as e:
-            print(f"DB Error: {e}")
+        if request and request.username:
+            user = request.username
+            print(f"Verified User: {user}")
+            try:
+                ensure_user_exists(user)
+            except Exception as e:
+                print(f"DB Error: {e}")
+            return gr.update(visible=True), gr.update(visible=False), get_status_markdown(user)
         
-        return gr.update(), get_status_markdown(user)
+        print("Redirecting to login prompt.")
+        return gr.update(visible=False), gr.update(visible=True), gr.update()
 
-    demo.load(check_user, None, [main_container, status_display], api_name=False)
+    demo.load(check_user, None, [main_container, login_prompt, status_display], api_name=False)
 
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name, request: gr.Request):
@@ -320,5 +328,5 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7860))
-    # Simple Auth for Railway MVP (Login: student / learn)
-    demo.launch(server_name="0.0.0.0", server_port=port, auth=("student", "learn"))
+    # OAuth is automatically enabled if OAUTH_ environment variables are set
+    demo.launch(server_name="0.0.0.0", server_port=port)
