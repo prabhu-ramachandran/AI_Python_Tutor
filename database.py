@@ -63,8 +63,8 @@ def verify_login(username, password):
         return True
     return False
 
-def save_progress(username, goal, module):
-    """Update the user's current progress."""
+def save_progress(username, goal, module, metrics=None):
+    """Update the user's current progress and save metrics."""
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     
@@ -72,32 +72,74 @@ def save_progress(username, goal, module):
     c.execute("SELECT completed_modules FROM progress WHERE username=?", (username,))
     row = c.fetchone()
     
-    completed = []
+    completed_data = {}
     if row:
-        completed = json.loads(row[0])
+        try:
+            loaded = json.loads(row[0])
+            # Migration: If it was a list (old format), convert to dict
+            if isinstance(loaded, list):
+                completed_data = {m: {"steps": 0, "score": 0} for m in loaded}
+            else:
+                completed_data = loaded
+        except:
+            completed_data = {}
     
-    # Add current module to completed list if moving past it? 
-    # For now, let's just track current state.
+    # Save the metrics for the *completed* module
+    # Note: 'module' here is usually the NEXT module we are moving TO.
+    # The metrics provided are for the module we just FINISHED.
+    # We might need to adjust logic in app.py to pass the correct finished module name.
+    # For now, let's assume 'metrics' contains the name of the finished module too if needed,
+    # or we handle it by passing the *finished* module as an argument.
+    
+    # Actually, simpler: The app calls this when a module is done.
+    # Let's assume 'module' passed here is the NEW state, but we want to record metrics for the PREVIOUS state?
+    # No, usually we save "I just finished Module X, here are its stats".
+    
+    if metrics and "completed_module_name" in metrics:
+        mod_name = metrics["completed_module_name"]
+        completed_data[mod_name] = {
+            "steps": metrics.get("steps", 0),
+            "timestamp": datetime.now().isoformat(),
+            "efficiency_score": max(100 - (metrics.get("steps", 0) * 2), 10) # Simple heuristic
+        }
     
     c.execute('''INSERT OR REPLACE INTO progress 
                  (username, current_goal, current_module, completed_modules, last_updated) 
                  VALUES (?, ?, ?, ?, ?)''',
-              (username, goal, module, json.dumps(completed), datetime.now().isoformat()))
+              (username, goal, module, json.dumps(completed_data), datetime.now().isoformat()))
     
     conn.commit()
     conn.close()
 
+def ensure_user_exists(username):
+    """Ensure a user exists in the DB (for OAuth users)."""
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT username FROM users WHERE username=?", (username,))
+    if not c.fetchone():
+        # Create user with a dummy password since they use OAuth
+        hashed = hash_password("oauth_user") 
+        c.execute("INSERT INTO users VALUES (?, ?, ?)", 
+                  (username, hashed, datetime.now().isoformat()))
+        conn.commit()
+    conn.close()
+
 def get_user_progress(username):
-    """Retrieve user's last known state."""
+    """Retrieve user's last known state and completion history."""
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     
-    c.execute("SELECT current_goal, current_module FROM progress WHERE username=?", (username,))
+    c.execute("SELECT current_goal, current_module, completed_modules FROM progress WHERE username=?", (username,))
     row = c.fetchone()
     conn.close()
     
     if row:
-        return {"goal": row[0], "module": row[1]}
+        completed = {}
+        try:
+            completed = json.loads(row[2])
+        except:
+            pass
+        return {"goal": row[0], "module": row[1], "completed": completed}
     return None
 
 # Auto-initialize on import

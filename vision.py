@@ -1,6 +1,47 @@
 import gradio as gr
+from database import get_user_progress
+import json
 
-def get_vision_tab():
+def calculate_xp(username):
+    if not username:
+        return {"Logic": 5, "Frontend": 5, "Database": 5} # Default 5% for visualization
+    
+    progress = get_user_progress(username)
+    if not progress or "completed" not in progress:
+        return {"Logic": 5, "Frontend": 5, "Database": 5}
+    
+    completed = progress["completed"] # Dict of {mod_name: metrics}
+    
+    # XP Counters
+    logic = 0
+    frontend = 0
+    db = 0
+    
+    for mod_name in completed.keys():
+        m = mod_name.lower()
+        if "logic" in m or "loop" in m or "condition" in m or "umpire" in m or "auditor" in m:
+            logic += 1
+        if "menu" in m or "html" in m or "string" in m or "ui" in m or "stadium" in m:
+            frontend += 1
+        if "variable" in m or "list" in m or "dictionary" in m or "csv" in m or "wallet" in m or "ledger" in m:
+            db += 1
+            
+    # Normalize (Assuming ~5 modules per skill for Level 1)
+    return {
+        "Logic": min(logic * 20, 100), 
+        "Frontend": min(frontend * 20, 100), 
+        "Database": min(db * 20, 100)
+    }
+
+def get_vision_tab(request: gr.Request = None):
+    # Calculate XP based on user
+    username = request.username if request else None
+    xp = calculate_xp(username)
+    
+    logic_pct = xp["Logic"]
+    ui_pct = xp["Frontend"]
+    db_pct = xp["Database"]
+
     with gr.TabItem("🚀 Vision & Roadmap"):
         gr.Markdown("# 🗺️ Your Journey to Full Stack AI Developer")
         gr.Markdown("Don't just learn syntax. Build a career. Here is how your small projects today turn into big skills tomorrow.")
@@ -53,17 +94,17 @@ def get_vision_tab():
             with gr.Column():
                 gr.Markdown("### 🧠 Logic Engine")
                 gr.Markdown("Start with `if/else` in Cricket. End with **Machine Learning** algorithms that think like humans.")
-                gr.HTML("<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #4a148c; height: 10px; width: 10%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: Beginner</p>")
+                gr.HTML(f"<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #4a148c; height: 10px; width: {logic_pct}%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: {logic_pct}%</p>")
             
             with gr.Column():
                 gr.Markdown("### 🎨 Frontend UI")
                 gr.Markdown("Start with `print()`. End with **Dynamic Web Apps** used by millions of people.")
-                gr.HTML("<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #1b5e20; height: 10px; width: 10%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: Beginner</p>")
+                gr.HTML(f"<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #1b5e20; height: 10px; width: {ui_pct}%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: {ui_pct}%</p>")
             
             with gr.Column():
                 gr.Markdown("### 🗄️ Database & Memory")
                 gr.Markdown("Start with `variables`. End with **Cloud Databases** that handle millions of records.")
-                gr.HTML("<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #e65100; height: 10px; width: 10%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: Beginner</p>")
+                gr.HTML(f"<div style='background-color: #ddd; height: 10px; width: 100%; border-radius: 5px;'><div style='background-color: #e65100; height: 10px; width: {db_pct}%; border-radius: 5px;'></div></div><p style='font-size: 0.8em; color: gray;'>Level: {db_pct}%</p>")
 
         gr.Markdown("---")
         gr.Markdown("### 🏁 Level 1 Outcomes: The Junior Builder")
