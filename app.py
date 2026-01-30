@@ -241,12 +241,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             chatbot_comp: []
         }
 
-        btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp])
+    btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp])
 
-    
-
-    if __name__ == "__main__":
-
-    
-
-        demo.launch()
+if __name__ == "__main__":
+    demo.launch()
