@@ -45,65 +45,82 @@ CURRICULUM = {
 
 # UI Layout
 with gr.Blocks(title="Bengaluru AI Tutor") as demo:
-    gr.Markdown("# 🏫 Bengaluru AI Code Lab")
-    
+    with gr.Row():
+        gr.Markdown("# 🏫 Bengaluru AI Code Lab")
+        login_btn = gr.LoginButton()
+
     # State Management
     current_view = gr.State("selection")
     selected_goal = gr.State(None)
     selected_mod = gr.State("Intro")
 
-    with gr.Tabs():
-        with gr.TabItem("🎓 Classroom"):
-            # --- VIEW 1: Goal Selection (Beginner Level) ---
-            with gr.Column(visible=True) as welcome_screen:
-                gr.Markdown("## 👋 Namaskara! What do you want to build first?")
-                gr.Markdown("Choose your **Beginner Level** project. We will learn Python step-by-step to build this.")
-                
-                with gr.Row():
-                    with gr.Column():
-                        gr.Markdown("### 🏏 Gully Cricket Game")
-                        gr.Markdown("Build a text game where you bat against the computer.")
-                        btn_cricket = gr.Button("Choose Cricket 🏏", variant="primary")
+    # This column will only be visible if the user is logged in
+    with gr.Column(visible=False) as main_container:
+        with gr.Tabs():
+            with gr.TabItem("🎓 Classroom"):
+                # --- VIEW 1: Goal Selection (Beginner Level) ---
+                with gr.Column(visible=True) as welcome_screen:
+                    gr.Markdown("## 👋 Namaskara! What do you want to build first?")
+                    gr.Markdown("Choose your **Beginner Level** project. We will learn Python step-by-step to build this.")
                     
-                    with gr.Column():
-                        gr.Markdown("### 🌐 Food Blog Generator")
-                        gr.Markdown("Create a tool to make a website for your favorite hotels.")
-                        btn_blog = gr.Button("Choose Food Blog 🌐", variant="primary")
-                    
-                    with gr.Column():
-                        gr.Markdown("### 💰 Kharcha Tracker")
-                        gr.Markdown("Build an app to track your daily expenses (Auto, Coffee, etc).")
-                        btn_finance = gr.Button("Choose Expense Tracker 💰", variant="primary")
-
-            # --- VIEW 2: The Classroom (Tutor Interface) ---
-            with gr.Column(visible=False) as tutor_screen:
-                with gr.Row():
-                    btn_back = gr.Button("⬅️ Back to Goals", size="sm")
-                    goal_display = gr.Markdown("Current Goal: ...")
-
-                with gr.Row():
-                    with gr.Column(scale=1):
-                        gr.Markdown("### 🗺️ Your Path")
-                        # Placeholder buttons for the curriculum
-                        m1 = gr.Button("1. Basics & Setup")
-                        m2 = gr.Button("2. Variables")
-                        m3 = gr.Button("3. Logic & Decisions")
-
-                        gr.Markdown("### 🔒 Level 2 (Locked)")
-                        gr.Button("4. Functions & Logic", interactive=False)
-                        gr.Button("5. Data Structures", interactive=False)
+                    with gr.Row():
+                        with gr.Column():
+                            gr.Markdown("### 🏏 Gully Cricket Game")
+                            gr.Markdown("Build a text game where you bat against the computer.")
+                            btn_cricket = gr.Button("Choose Cricket 🏏", variant="primary")
                         
-                        gr.Markdown("### 🔒 Level 3 (Locked)")
-                        gr.Button("6. Final Project", interactive=False)
+                        with gr.Column():
+                            gr.Markdown("### 🌐 Food Blog Generator")
+                            gr.Markdown("Create a tool to make a website for your favorite hotels.")
+                            btn_blog = gr.Button("Choose Food Blog 🌐", variant="primary")
+                        
+                        with gr.Column():
+                            gr.Markdown("### 💰 Kharcha Tracker")
+                            gr.Markdown("Build an app to track your daily expenses (Auto, Coffee, etc).")
+                            btn_finance = gr.Button("Choose Expense Tracker 💰", variant="primary")
 
-                    with gr.Column(scale=3):
-                        chatbot_comp = gr.Chatbot(label="Socratic Tutor")
-                        with gr.Row():
-                            txt_input = gr.Textbox(show_label=False, placeholder="Type your answer here...", scale=4)
-                            btn_submit = gr.Button("Send ➤", scale=1)
-        
-        # Add the Vision Tab
-        get_vision_tab()
+                # --- VIEW 2: The Classroom (Tutor Interface) ---
+                with gr.Column(visible=False) as tutor_screen:
+                    with gr.Row():
+                        btn_back = gr.Button("⬅️ Back to Goals", size="sm")
+                        goal_display = gr.Markdown("Current Goal: ...")
+
+                    with gr.Row():
+                        with gr.Column(scale=1):
+                            gr.Markdown("### 🗺️ Your Path")
+                            # Placeholder buttons for the curriculum
+                            m1 = gr.Button("1. Basics & Setup")
+                            m2 = gr.Button("2. Variables")
+                            m3 = gr.Button("3. Logic & Decisions")
+
+                            gr.Markdown("### 🔒 Level 2 (Locked)")
+                            gr.Button("4. Functions & Logic", interactive=False)
+                            gr.Button("5. Data Structures", interactive=False)
+                            
+                            gr.Markdown("### 🔒 Level 3 (Locked)")
+                            gr.Button("6. Final Project", interactive=False)
+
+                        with gr.Column(scale=3):
+                            chatbot_comp = gr.Chatbot(label="Socratic Tutor")
+                            with gr.Row():
+                                txt_input = gr.Textbox(show_label=False, placeholder="Type your answer here...", scale=4)
+                                btn_submit = gr.Button("Send ➤", scale=1)
+            
+            # Add the Vision Tab
+            get_vision_tab()
+
+    # Message to show when not logged in
+    with gr.Column(visible=True) as login_prompt:
+        gr.Markdown("### Please sign in to start your learning journey! 🚀")
+        gr.Markdown("We use Hugging Face login (which supports Google/Gmail) to save your progress safely.")
+
+    # --- Logic for Login Handling ---
+    def check_user(request: gr.Request):
+        if request and request.username:
+            return gr.update(visible=True), gr.update(visible=False)
+        return gr.update(visible=False), gr.update(visible=True)
+
+    demo.load(check_user, None, [main_container, login_prompt])
 
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name):
