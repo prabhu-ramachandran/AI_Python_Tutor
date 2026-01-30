@@ -123,7 +123,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
         gr.Markdown("We use Hugging Face login (which supports Google/Gmail) to save your progress safely.")
 
     # --- Logic for Login Handling ---
-    def check_user(request):
+    def check_user(request: gr.Request):
         print(f"--- Login Check ---")
         if request:
             print(f"Request detected. Username: {request.username}")
@@ -146,7 +146,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     demo.load(check_user, None, [main_container, login_prompt], api_name=False)
 
     # --- Chat Logic with Side Effects ---
-    def submit_message(user_text, history, module_name, goal_name, request):
+    def submit_message(user_text, history, module_name, goal_name, request: gr.Request):
         if not user_text.strip():
             return {txt_input: gr.update()}
 
