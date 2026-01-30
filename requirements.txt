@@ -201,3 +201,4 @@ widgetsnbextension==4.0.15
 xxhash==3.6.0
 zopfli==0.4.0
 zstandard==0.25.0
+gradio==6.5.1
