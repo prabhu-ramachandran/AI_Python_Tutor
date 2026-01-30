@@ -4,6 +4,8 @@ from langchain_core.messages import HumanMessage, AIMessage
 from vision import get_vision_tab
 # Database imports
 from database import save_progress, ensure_user_exists, get_user_progress
+from sandbox import execute_code_safely
+import os
 
 def chat_with_tutor(message, history, module_name, goal_name):
     # Convert history for the Agent
@@ -80,17 +82,17 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                         with gr.Column():
                             gr.Markdown("### 🏏 Gully Cricket Game")
                             gr.Markdown("Build a text game where you bat against the computer.")
-                            btn_cricket = gr.Button("Choose Cricket 🏏", variant="primary")
+                            btn_cricket = gr.Button("Choose Cricket 🏏", variant="primary", interactive=True)
                         
                         with gr.Column():
                             gr.Markdown("### 🌐 Food Blog Generator")
                             gr.Markdown("Create a tool to make a website for your favorite hotels.")
-                            btn_blog = gr.Button("Choose Food Blog 🌐", variant="primary")
+                            btn_blog = gr.Button("Choose Food Blog 🌐", variant="primary", interactive=True)
                         
                         with gr.Column():
                             gr.Markdown("### 💰 Kharcha Tracker")
                             gr.Markdown("Build an app to track your daily expenses (Auto, Coffee, etc).")
-                            btn_finance = gr.Button("Choose Expense Tracker 💰", variant="primary")
+                            btn_finance = gr.Button("Choose Expense Tracker 💰", variant="primary", interactive=True)
 
                 # --- VIEW 2: The Classroom (Tutor Interface) ---
                 with gr.Column(visible=False) as tutor_screen:
@@ -117,6 +119,15 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                             with gr.Row():
                                 txt_input = gr.Textbox(show_label=False, placeholder="Type your answer here...", scale=4)
                                 btn_submit = gr.Button("Send ➤", scale=1)
+                            
+                            # --- CODE SANDBOX ---
+                            gr.Markdown("### 🐍 Python Sandbox")
+                            with gr.Row():
+                                code_input = gr.Code(language="python", label="Write your code here", lines=5)
+                            with gr.Row():
+                                btn_run = gr.Button("▶️ Run Code", variant="secondary")
+                            
+                            code_output = gr.Textbox(label="Terminal Output", interactive=False, max_lines=10)
             
             # Add the Vision Tab
             get_vision_tab()
@@ -215,6 +226,22 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             selected_mod: updated_mod_state
         }
 
+    # --- Code Execution Logic ---
+    def run_code_and_chat(code, history, module_name, goal_name, request: gr.Request):
+        # 1. Execute Code
+        output = execute_code_safely(code)
+        
+        # 2. Formulate message to AI
+        user_msg = f"I wrote this code:\n```python\n{code}\n```\n\nAnd got this output:\n```\n{output}\n```\n\nIs this correct?"
+        
+        # 3. Call existing chat logic (reuses AI + DB logic)
+        # We return the output to the Terminal box AND the Chatbot response
+        result_dict = submit_message(user_msg, history, module_name, goal_name, request)
+        
+        # Merge the code output update
+        result_dict[code_output] = output
+        return result_dict
+
     # Wire up the Custom Chat
     txt_input.submit(
         submit_message, 
@@ -226,6 +253,14 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
         submit_message, 
         [txt_input, chatbot_comp, selected_mod, selected_goal], 
         [chatbot_comp, txt_input, selected_mod],
+        api_name=False
+    )
+    
+    # Wire up the Sandbox
+    btn_run.click(
+        run_code_and_chat,
+        [code_input, chatbot_comp, selected_mod, selected_goal],
+        [chatbot_comp, txt_input, selected_mod, code_output],
         api_name=False
     )
 
@@ -282,10 +317,6 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
         }
 
     btn_back.click(go_back, None, [welcome_screen, tutor_screen, selected_goal, chatbot_comp, status_display], api_name=False)
-
-import os
-
-# ... (rest of the file) ...
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7860))
