@@ -4,7 +4,10 @@ import os
 import json
 from datetime import datetime
 
+# Determine DB Path (Hugging Face Spaces often needs /tmp or a specific data dir)
 DB_NAME = "tutor_db.sqlite"
+if not os.access(".", os.W_OK):
+    DB_NAME = "/tmp/tutor_db.sqlite"
 
 def init_db():
     """Initialize the database with users and progress tables."""

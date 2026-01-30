@@ -124,8 +124,23 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
 
     # --- Logic for Login Handling ---
     def check_user(request):
+        print(f"--- Login Check ---")
+        if request:
+            print(f"Request detected. Username: {request.username}")
+        else:
+            print("No request object detected.")
+
         if request and request.username:
+            try:
+                # Auto-register user if new
+                ensure_user_exists(request.username)
+                print(f"User {request.username} verified in database.")
+            except Exception as e:
+                print(f"Database error during login: {e}")
+            
             return gr.update(visible=True), gr.update(visible=False)
+        
+        print("Redirecting to login prompt.")
         return gr.update(visible=False), gr.update(visible=True)
 
     demo.load(check_user, None, [main_container, login_prompt], api_name=False)
