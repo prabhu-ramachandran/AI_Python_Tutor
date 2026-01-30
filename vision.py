@@ -49,6 +49,7 @@ def get_vision_tab(request = None):
         # Mermaid.js Diagram for the Skill Tree
         gr.Markdown("""
         ```mermaid
+        %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#1f2937', 'edgeLabelBackground':'#111827', 'tertiaryColor': '#111827'}}}%%
         graph TD
             subgraph Level 1: Beginner Portfolio
                 CG[🏏 Cricket Game] -->|Teaches| Logic(🧠 Logic & Control)
@@ -78,15 +79,15 @@ def get_vision_tab(request = None):
                 React --> Dashboard(📊 AI Dashboards)
             end
 
-            style CG fill:#e1f5fe,stroke:#01579b
-            style FB fill:#e8f5e9,stroke:#1b5e20
-            style ET fill:#fff3e0,stroke:#e65100
+            style CG fill:#0d47a1,stroke:#e1f5fe,color:white
+            style FB fill:#1b5e20,stroke:#e8f5e9,color:white
+            style ET fill:#e65100,stroke:#fff3e0,color:white
             
-            style Git fill:#fff9c4,stroke:#fbc02d
+            style Git fill:#fbc02d,stroke:#fff9c4,color:black
             
-            style Logic fill:#f3e5f5,stroke:#4a148c
-            style UI fill:#f3e5f5,stroke:#4a148c
-            style DB fill:#f3e5f5,stroke:#4a148c
+            style Logic fill:#4a148c,stroke:#f3e5f5,color:white
+            style UI fill:#4a148c,stroke:#f3e5f5,color:white
+            style DB fill:#4a148c,stroke:#f3e5f5,color:white
         ```
         """)
 
