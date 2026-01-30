@@ -33,7 +33,7 @@ def calculate_xp(username):
         "Database": min(db * 20, 100)
     }
 
-def get_vision_tab(request: gr.Request = None):
+def get_vision_tab(request = None):
     # Calculate XP based on user
     username = request.username if request else None
     xp = calculate_xp(username)
