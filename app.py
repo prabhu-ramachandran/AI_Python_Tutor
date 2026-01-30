@@ -63,8 +63,8 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
     selected_goal = gr.State(None)
     selected_mod = gr.State("Intro")
 
-    # This column will only be visible if the user is logged in
-    with gr.Column(visible=False) as main_container:
+    # This column contains the main app
+    with gr.Column(visible=True) as main_container:
         with gr.Tabs():
             with gr.TabItem("🎓 Classroom"):
                 # --- VIEW 1: Goal Selection (Beginner Level) ---
@@ -117,23 +117,18 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
             # Add the Vision Tab
             get_vision_tab()
 
-    # Message to show when not logged in
-    with gr.Column(visible=True) as login_prompt:
-        gr.Markdown("### Please sign in to start your learning journey! 🚀")
-        gr.Markdown("We use Hugging Face login (which supports Google/Gmail) to save your progress safely.")
-
     # --- Logic for Login Handling ---
     def check_user(request: gr.Request):
         print(f"--- Login Check ---")
-        # With Basic Auth, if this runs, they are logged in.
-        # Gradio populates request.username for Basic Auth too.
-        user = request.username if request else "student"
-        
-        print(f"Verified User: {user}")
-        ensure_user_exists(user)
-        return gr.update(visible=True), gr.update(visible=False)
+        user = request.username if (request and request.username) else "student"
+        print(f"User: {user}")
+        try:
+            ensure_user_exists(user)
+        except Exception as e:
+            print(f"DB Error: {e}")
+        return gr.update() # No visibility change needed
 
-    demo.load(check_user, None, [main_container, login_prompt], api_name=False)
+    demo.load(check_user, None, None, api_name=False)
 
     # --- Chat Logic with Side Effects ---
     def submit_message(user_text, history, module_name, goal_name, request: gr.Request):
