@@ -109,7 +109,7 @@ with gr.Blocks(title="Bengaluru AI Tutor", theme=gr.themes.Soft()) as demo:
                             gr.Button("7. Advanced Engineering", interactive=False)
                             
                         with gr.Column(scale=3):
-                            chatbot_comp = gr.Chatbot(label="Socratic Tutor", type="messages")
+                            chatbot_comp = gr.Chatbot(label="Socratic Tutor")
                             with gr.Row():
                                 txt_input = gr.Textbox(show_label=False, placeholder="Type your answer here...", scale=4)
                                 btn_submit = gr.Button("Send ➤", scale=1)
