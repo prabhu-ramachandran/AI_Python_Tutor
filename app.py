@@ -18,7 +18,7 @@ from sandbox import execute_code_safely
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.environ.get("OAUTH_CLIENT_SECRET", "bangalore-secret-key-123"))
 
- oauth = OAuth()
+oauth = OAuth()
 oauth.register(
     name='google',
     client_id=os.environ.get('OAUTH_CLIENT_ID'),
